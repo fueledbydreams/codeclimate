@@ -1,1 +1,1 @@
-# codeclimate
+# Code Climate
