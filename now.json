@@ -4,15 +4,15 @@
   ],
   "builds": [
     {
-      "src": "index.js",
+      "src": "src/**/*.js",
       "use": "@now/node"
     }
   ],
   "name": "codeclimate",
   "routes": [
     {
-      "src": "/gauge.svg",
-      "dest": "/gauge.js"
+      "src": "/",
+      "dest": "src/index.js"
     }
   ],
   "version": 2
