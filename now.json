@@ -1,16 +1,19 @@
 {
-  "name": "codeclimate",
-  "version": 2,
+  "alias": [
+    "codeclimate.fueledbydreams.com"
+  ],
   "builds": [
     {
       "src": "index.js",
       "use": "@now/node"
     }
   ],
+  "name": "codeclimate",
   "routes": [
     {
       "src": "/gauge.svg",
       "dest": "/gauge.js"
     }
-  ]
+  ],
+  "version": 2
 }
