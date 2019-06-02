@@ -19,7 +19,6 @@ module.exports = async ({ repoInfo }) => {
   const issuesResponse = await getIssues(repoID, snapshotId);
   issues = getIssuesSelector(issuesResponse);
 
-  console.log(repoInfo);
   const githubRepo = getGithubRepo(repoInfo);
   const githubBranch = getGithubBranch(repoInfo);
 
