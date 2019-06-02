@@ -1,35 +1,32 @@
 const { htm } = require('@zeit/integration-utils');
 
 const getIssues = require('../services/get-issues');
-const getRepository = require('../services/get-repository');
 
 const getGithubBranch = require('../selectors/get-github-branch');
 const getGithubFilePath = require('../selectors/get-github-file-path');
 const getGithubRepo = require('../selectors/get-github-repo');
 const getIssuesSelector = require('../selectors/get-issues');
 const getSnapshotId = require('../selectors/get-snapshot-id');
+const getCodeClimateId = require('../selectors/get-code-climate-id');
 
 const getSeverityColor = require('../utilities/get-severity-color');
 
-module.exports = async ({ payload, zeitClient }) => {
-  const store = await zeitClient.getMetadata();
-  let repoInfo;
+module.exports = async ({ repoInfo }) => {
   let issues;
 
-  if (store.appID) {
-    repoInfo = await getRepository(store.appID);
-    const snapshotId = getSnapshotId(repoInfo);
-    const issuesResponse = await getIssues(store.appID, snapshotId);
-    issues = getIssuesSelector(issuesResponse);
-  }
+  const repoID = getCodeClimateId(repoInfo);
+  const snapshotId = getSnapshotId(repoInfo);
+  const issuesResponse = await getIssues(repoID, snapshotId);
+  issues = getIssuesSelector(issuesResponse);
 
+  console.log(repoInfo);
   const githubRepo = getGithubRepo(repoInfo);
   const githubBranch = getGithubBranch(repoInfo);
 
   return htm`
     <Container>
         ${issues.map(
-          (issue) => htm`
+    (issue) => htm`
               <Box marginBottom="20px">
                 <Box fontSize="18px" display="flex">
                   <Box width="10px" height="10px" borderRadius="50%" 
@@ -43,7 +40,7 @@ module.exports = async ({ payload, zeitClient }) => {
                 </Box>
               </Box>
             `
-        )}
+  )}
     </Container>
   `;
 };

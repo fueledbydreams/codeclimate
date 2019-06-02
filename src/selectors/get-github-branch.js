@@ -1,1 +1,1 @@
-module.exports = (repoInfo) => repoInfo.data.data.attributes.branch;
+module.exports = (repoInfo) => repoInfo.data[0].attributes.branch;

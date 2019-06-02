@@ -39,19 +39,11 @@ module.exports = async ({ repoInfo }) => {
           <Box marginBottom="20px" fontSize="30px" lineHeight="40px">Breakdown</Box>
           <H2>32 Files</H2>
           <Box backgroundColor="#f7f7f7" display="inline-block" height="10px" width="100%">
-            <Box width="20%" backgroundColor="#45d298" float="left" height="100%" position="relative"/>
-            <Box width="20%" backgroundColor="#a5d86e" float="left" height="100%" position="relative"/>
-            <Box width="20%" backgroundColor="#f1ce0c" float="left" height="100%" position="relative"/>
-            <Box width="20%" backgroundColor="#f29141" float="left" height="100%" position="relative"/>
-            <Box width="20%" backgroundColor="#df5869" float="left" height="100%" position="relative"/>
+            <Box width="100%" backgroundColor=${snapshotColor} float="left" height="100%" position="relative"/>
           </Box>
           <H2>Maintainability</H2>
           <Box backgroundColor="#f7f7f7" display="inline-block" height="10px" width="100%">
-            <Box width="20%" backgroundColor="#45d298" float="left" height="100%" position="relative"/>
-            <Box width="20%" backgroundColor="#a5d86e" float="left" height="100%" position="relative"/>
-            <Box width="20%" backgroundColor="#f1ce0c" float="left" height="100%" position="relative"/>
-            <Box width="20%" backgroundColor="#f29141" float="left" height="100%" position="relative"/>
-            <Box width="20%" backgroundColor="#df5869" float="left" height="100%" position="relative"/>
+            <Box width="100%" backgroundColor=${codeCoverageColor} float="left" height="100%" position="relative"/>
           </Box>
           <H2>Test coverage</H2>
         </Box>
@@ -78,19 +70,19 @@ module.exports = async ({ repoInfo }) => {
             <Box flexBasis="33.33333333%" margin="0 0 0.6rem" padding="0 0.6rem">
               <Box color="#7f7f7f" fontSize="40px" fontWeight="300" lineHeight="1">
                 <Box color="#7f7f7f" fontSize="12px" letterSpacing=".2em" lineHeight="20px" textTransform="uppercase">Code Smells</Box>
-                <Link href="https://codeclimate.com/github/${ghSlug}/issues?category=complexity&amp;engine_name%5B%5D=structure&amp;engine_name%5B%5D=duplication">11</Link>              
+                <Link href=${`https://codeclimate.com/github/${ghSlug}/issues?category=complexity&amp;engine_name%5B%5D=structure&amp;engine_name%5B%5D=duplication`}>11</Link>              
               </Box>
             </Box>          
             <Box flexBasis="33.33333333%" margin="0 0 0.6rem" padding="0 0.6rem">
               <Box color="#7f7f7f" fontSize="40px" fontWeight="300" lineHeight="1">
                 <Box color="#7f7f7f" fontSize="12px" letterSpacing=".2em" lineHeight="20px" textTransform="uppercase">Duplication</Box>
-                <Link href="https://codeclimate.com//github/${ghSlug}/issues?category=duplication&engine_name%5B%5D=structure&engine_name%5B%5D=duplication">0</Link>              
+                <Link href=${`https://codeclimate.com/github/${ghSlug}/issues?category=duplication&engine_name%5B%5D=structure&engine_name%5B%5D=duplication`}>0</Link>              
               </Box>
             </Box>          
             <Box flexBasis="33.33333333%" margin="0 0 0.6rem" padding="0 0.6rem">
               <Box color="#7f7f7f" fontSize="40px" fontWeight="300" lineHeight="1">
                 <Box color="#7f7f7f" fontSize="12px" letterSpacing=".2em" lineHeight="20px" textTransform="uppercase">Other Issues</Box>
-                <Link href="https://codeclimate.com/github/${ghSlug}/issues">125</Link>              
+                <Link href=${`https://codeclimate.com/github/${ghSlug}/issues`}>125</Link>              
               </Box>
             </Box>          
           </Box>
