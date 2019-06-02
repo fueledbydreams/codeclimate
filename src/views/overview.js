@@ -1,32 +1,34 @@
 const { htm } = require('@zeit/integration-utils');
 
-const getRepository = require("../services/get-repository");
 const getSnapshot = require("../services/get-snapshot");
 const getTestCoverageReport = require("../services/get-test-coverage-report");
 
+const getCodeClimateId = require("../selectors/get-code-climate-id");
 const getSnapshotId = require("../selectors/get-snapshot-id");
 const getCodeCoverage = require("../selectors/get-code-coverage");
 const getCodeCoverageRating = require("../selectors/get-code-coverage-rating");
 const getSnapshotRating = require("../selectors/get-snapshot-rating");
+const getGitHubSlugFromRepoInfo = require("../selectors/get-github-slug-from-repo-info");
 
 const getColor = require("../utilities/get-color");
 
-module.exports = async ({ zeitClient }) => {
-  const store = await zeitClient.getMetadata();
-  let repoInfo;
-  let testCoverageReport;
+module.exports = async ({ repoInfo }) => {
+  const repoID = getCodeClimateId(repoInfo);
+  const testCoverageReport = await getTestCoverageReport(repoID);
 
-  if (store.appID) {
-    repoInfo = await getRepository(store.appID);
-    testCoverageReport = await getTestCoverageReport(store.appID);
+  let codeCoverage = 0;
+  let codeCoverageRating = 'F';
+  let codeCoverageColor = getColor(codeCoverageRating);
+
+  if (testCoverageReport.data.length > 0) {
+    codeCoverage = getCodeCoverage(testCoverageReport.data);
+    codeCoverageRating = getCodeCoverageRating(testCoverageReport.data);
+    codeCoverageColor = getColor(codeCoverageRating);
   }
 
-  const codeCoverage = getCodeCoverage(testCoverageReport.data);
-  const codeCoverageRating = getCodeCoverageRating(testCoverageReport.data);
-  const codeCoverageColor = getColor(codeCoverageRating);
-
   const snapshotId = getSnapshotId(repoInfo);
-  const snapshot = await getSnapshot(store.appID, snapshotId);
+  const ghSlug = getGitHubSlugFromRepoInfo(repoInfo);
+  const snapshot = await getSnapshot(repoID, snapshotId);
   const snapshotRating = getSnapshotRating(snapshot.data);
   const snapshotColor = getColor(snapshotRating);
 
@@ -76,19 +78,19 @@ module.exports = async ({ zeitClient }) => {
             <Box flexBasis="33.33333333%" margin="0 0 0.6rem" padding="0 0.6rem">
               <Box color="#7f7f7f" fontSize="40px" fontWeight="300" lineHeight="1">
                 <Box color="#7f7f7f" fontSize="12px" letterSpacing=".2em" lineHeight="20px" textTransform="uppercase">Code Smells</Box>
-                <Link href="https://codeclimate.com/github/jameswlane/jest-express/issues?category=complexity&amp;engine_name%5B%5D=structure&amp;engine_name%5B%5D=duplication">11</Link>              
+                <Link href="https://codeclimate.com/github/${ghSlug}/issues?category=complexity&amp;engine_name%5B%5D=structure&amp;engine_name%5B%5D=duplication">11</Link>              
               </Box>
             </Box>          
             <Box flexBasis="33.33333333%" margin="0 0 0.6rem" padding="0 0.6rem">
               <Box color="#7f7f7f" fontSize="40px" fontWeight="300" lineHeight="1">
                 <Box color="#7f7f7f" fontSize="12px" letterSpacing=".2em" lineHeight="20px" textTransform="uppercase">Duplication</Box>
-                <Link href="https://codeclimate.com//github/jameswlane/jest-express/issues?category=duplication&engine_name%5B%5D=structure&engine_name%5B%5D=duplication">0</Link>              
+                <Link href="https://codeclimate.com//github/${ghSlug}/issues?category=duplication&engine_name%5B%5D=structure&engine_name%5B%5D=duplication">0</Link>              
               </Box>
             </Box>          
             <Box flexBasis="33.33333333%" margin="0 0 0.6rem" padding="0 0.6rem">
               <Box color="#7f7f7f" fontSize="40px" fontWeight="300" lineHeight="1">
                 <Box color="#7f7f7f" fontSize="12px" letterSpacing=".2em" lineHeight="20px" textTransform="uppercase">Other Issues</Box>
-                <Link href="https://codeclimate.com/github/jameswlane/jest-express/issues">125</Link>              
+                <Link href="https://codeclimate.com/github/${ghSlug}/issues">125</Link>              
               </Box>
             </Box>          
           </Box>

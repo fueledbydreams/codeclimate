@@ -1,40 +1,56 @@
 const { withUiHook } = require('@zeit/integration-utils');
 
-const code = require('./views/code');
+const getGitHubInfo = require('./services/get-github-info');
+const getRepositoryByGithubSlug = require('./services/get-repository-by-github-slug');
+
+const getGitHubOrgName = require('./selectors/get-github-org-name');
+const getGitHubRepoName = require('./selectors/get-github-repo-name');
+
 const issues = require('./views/issues');
 const overview = require('./views/overview');
-const progress = require('./views/progress');
 const settings = require('./views/settings');
-const trends = require('./views/trends');
 const withPage = require('./views/with-page');
 
 module.exports = withUiHook(async ({ payload, zeitClient }) => {
   const { action } = payload;
-  const store = await zeitClient.getMetadata();
+
+  let githubSlug;
+  let repoInfo;
+
+  if (payload.projectId) {
+    const deployments = await getGitHubInfo(payload.projectId, payload.token);
+    const ghOrg = getGitHubOrgName(deployments.data);
+    const ghRepo = getGitHubRepoName(deployments.data);
+    githubSlug = `${ghOrg}/${ghRepo}`
+  }
+
+  if (githubSlug) {
+    repoInfo = await getRepositoryByGithubSlug(githubSlug);
+  }
+
 
   switch (action) {
     case 'overview': {
-      return withPage(overview, payload, zeitClient);
-    }
-    case 'progress': {
-      return withPage(progress, payload, zeitClient);
+      if (repoInfo && repoInfo.data.data.length > 0) {
+        return withPage(overview, payload, zeitClient, repoInfo.data);
+      } else {
+        return withPage(settings, payload, zeitClient);
+      }
     }
     case 'issues': {
-      return withPage(issues, payload, zeitClient);
-    }
-    case 'code': {
-      return withPage(code, payload, zeitClient);
-    }
-    case 'trends': {
-      return withPage(trends, payload, zeitClient);
+      if (repoInfo && repoInfo.data.data.length > 0) {
+        return withPage(issues, payload, zeitClient, repoInfo.data);
+      } else {
+        return withPage(settings, payload, zeitClient);
+      }
     }
     case 'settings': {
       return withPage(settings, payload, zeitClient);
     }
     default: {
-      if (store.appID && store.appID.length > 0) {
+      if (repoInfo && repoInfo.data.data.length > 0) {
         payload.action = 'overview';
-        return withPage(overview, payload, zeitClient);
+        return withPage(overview, payload, zeitClient, repoInfo.data);
       } else {
         payload.action = 'settings';
         return withPage(settings, payload, zeitClient);
