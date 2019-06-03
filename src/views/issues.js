@@ -7,10 +7,12 @@ const getGithubBranch = require('../selectors/get-github-branch');
 const getGithubFilePath = require('../selectors/get-github-file-path');
 const getGithubRepo = require('../selectors/get-github-repo');
 const getIssuesSelector = require('../selectors/get-issues');
+const getIssueCount = require('../selectors/get-issue-count');
 const getSnapshotId = require('../selectors/get-snapshot-id');
 const getCodeClimateId = require('../selectors/get-code-climate-id');
 const getIssuesPreviousPageSelector = require('../selectors/get-issues-previous-page');
 const getIssuesNextPageSelector = require('../selectors/get-issues-next-page');
+const getIssuesCurrentPageNumber = require('../selectors/get-issues-current-page-number');
 
 const getSeverityColor = require('../utilities/get-severity-color');
 
@@ -30,6 +32,10 @@ module.exports = async ({ repoInfo, props }) => {
   const issues = getIssuesSelector(issuesResponse);
   const previousPage = getIssuesPreviousPageSelector(issuesResponse);
   const nextPage = getIssuesNextPageSelector(issuesResponse);
+  const issueCount = getIssueCount(issuesResponse);
+  const currentPageNumber = getIssuesCurrentPageNumber(issuesResponse);
+  const numberOfIssuesStart = (currentPageNumber - 1) * 30 + 1;
+  const numberOfIssuesEnd = currentPageNumber * 30 > issueCount ? issueCount : currentPageNumber * 30;
 
   const githubRepo = getGithubRepo(repoInfo);
   const githubBranch = getGithubBranch(repoInfo);
@@ -42,7 +48,17 @@ module.exports = async ({ repoInfo, props }) => {
               <Box display="flex" alignItems="center" justifyContent="center">
                 <Notice type="success">No issues found!</Notice>
               </Box>`
-            : issues.map(
+            : htm`
+              ${
+                issueCount > 30
+                  ? htm`
+                  <Box color="#7f7f7f" marginBottom="1rem">
+                    Showing ${numberOfIssuesStart}-${numberOfIssuesEnd} out of ${issueCount} total issues
+                  </Box>`
+                  : ''
+              }
+              
+              ${issues.map(
                 (issue) => htm`
                 <Box marginBottom="20px">
                   <Box fontSize="18px" display="flex">
@@ -57,7 +73,7 @@ module.exports = async ({ repoInfo, props }) => {
                   </Box>
                 </Box>
               `
-              )
+              )}`
         }
         ${previousPage ? htm`<Button action="${`issues-${previousPage}`}">Previous Page</Button>` : ''}
         ${nextPage ? htm`<Button action="${`issues-${nextPage}`}">Next Page</Button>` : ''}
