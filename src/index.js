@@ -21,15 +21,16 @@ module.exports = withUiHook(async ({ payload, zeitClient }) => {
     const deployments = await getGitHubInfo(payload.projectId, payload.token);
     const ghOrg = getGitHubOrgName(deployments.data);
     const ghRepo = getGitHubRepoName(deployments.data);
-    githubSlug = `${ghOrg}/${ghRepo}`
+    githubSlug = `${ghOrg}/${ghRepo}`;
   }
 
   if (githubSlug) {
     repoInfo = await getRepositoryByGithubSlug(githubSlug);
   }
 
+  let [actionName, requestedIssuesPage] = action.split('-');
 
-  switch (action) {
+  switch (actionName) {
     case 'overview': {
       if (repoInfo && repoInfo.data.data.length > 0) {
         return withPage(overview, payload, zeitClient, repoInfo.data);
@@ -39,7 +40,7 @@ module.exports = withUiHook(async ({ payload, zeitClient }) => {
     }
     case 'issues': {
       if (repoInfo && repoInfo.data.data.length > 0) {
-        return withPage(issues, payload, zeitClient, repoInfo.data);
+        return withPage(issues, payload, zeitClient, repoInfo.data, { requestedIssuesPage });
       } else {
         return withPage(settings, payload, zeitClient);
       }

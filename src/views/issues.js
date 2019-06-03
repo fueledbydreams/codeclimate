@@ -9,27 +9,27 @@ const getGithubRepo = require('../selectors/get-github-repo');
 const getIssuesSelector = require('../selectors/get-issues');
 const getSnapshotId = require('../selectors/get-snapshot-id');
 const getCodeClimateId = require('../selectors/get-code-climate-id');
-const getIssuesNextPage = require('../selectors/get-issues-next-page');
+const getIssuesPreviousPageSelector = require('../selectors/get-issues-previous-page');
+const getIssuesNextPageSelector = require('../selectors/get-issues-next-page');
 
 const getSeverityColor = require('../utilities/get-severity-color');
 
-let nextPage = '';
-
-module.exports = async ({ repoInfo }) => {
-  let issues;
+module.exports = async ({ repoInfo, props }) => {
+  let requestedIssuesPage = props.requestedIssuesPage;
 
   const repoID = getCodeClimateId(repoInfo);
   const snapshotId = getSnapshotId(repoInfo);
   let issuesResponse;
 
-  if (nextPage === '') {
-    issuesResponse = await getIssues(repoID, snapshotId);
+  if (requestedIssuesPage) {
+    issuesResponse = await getIssuesByNextPage(requestedIssuesPage);
   } else {
-    issuesResponse = await getIssuesByNextPage(nextPage);
+    issuesResponse = await getIssues(repoID, snapshotId);
   }
 
-  issues = getIssuesSelector(issuesResponse);
-  nextPage = getIssuesNextPage(issuesResponse);
+  const issues = getIssuesSelector(issuesResponse);
+  const previousPage = getIssuesPreviousPageSelector(issuesResponse);
+  const nextPage = getIssuesNextPageSelector(issuesResponse);
 
   const githubRepo = getGithubRepo(repoInfo);
   const githubBranch = getGithubBranch(repoInfo);
@@ -59,6 +59,8 @@ module.exports = async ({ repoInfo }) => {
               `
               )
         }
+        ${previousPage ? htm`<Button action="${`issues-${previousPage}`}">Previous Page</Button>` : ''}
+        ${nextPage ? htm`<Button action="${`issues-${nextPage}`}">Next Page</Button>` : ''}
     </Container>
   `;
 };
